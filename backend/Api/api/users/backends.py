@@ -11,7 +11,7 @@ class EmailBackend(BaseBackend):
         try:
             user = user_model.objects.get(email=username)
             return user if user.check_password(password) else None
-        except (user_model.DoesNotExist, user_model.MultiplyObjectsReturned):
+        except (user_model.DoesNotExist, user_model.MultipleObjectsReturned):
             return None
 
     def get_user(self, user_id):
@@ -20,4 +20,3 @@ class EmailBackend(BaseBackend):
             return user_model.objects.get(pk=user_id)
         except user_model.DoesNotExist:
             return None
-
