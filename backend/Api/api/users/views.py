@@ -3,8 +3,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.contrib.auth import login, logout
-from users.models import User
-from users.serializers import UserSerializer, LoginSerializer
+from .models import User
+from .serializers import UserSerializer, LoginSerializer, RegisterUserSerializer
 
 
 # Create your views here.
@@ -13,6 +13,11 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return RegisterUserSerializer
+        return self.serializer_class
+
     def list(self, request, *args, **kwargs):
         """
         Возвращает список всех пользователей.
@@ -20,7 +25,6 @@ class UserViewSet(viewsets.ModelViewSet):
         users = self.queryset
         serializer = self.serializer_class(users, many=True)
         return Response(serializer.data)
-
 
     def create(self, request, *args, **kwargs):
         # создает нового пользователя
@@ -46,6 +50,7 @@ class UserViewSet(viewsets.ModelViewSet):
         # изменение пароля авторизованного пользователя
         return Response
 
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
@@ -63,6 +68,7 @@ def login_view(request):
 
     # Возвращаем ошибки сериализатора, если данные невалидны
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

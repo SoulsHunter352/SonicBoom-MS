@@ -2,7 +2,8 @@ from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-from users.models import User
+from .models import User
+
 
 class UserSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)  # id пользователя, не может быть изменено
@@ -91,7 +92,6 @@ class LoginSerializer(serializers.ModelSerializer):
         Возвращает аутентифицированного пользователя из контекста.
         """
         return self.context.get('user')
-
 
 
 class ChangePasswordSerializer(serializers.ModelSerializer):
