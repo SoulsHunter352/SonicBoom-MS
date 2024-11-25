@@ -85,6 +85,8 @@ class LoginSerializer(serializers.ModelSerializer):
         if not user:
             raise serializers.ValidationError("Неверный логин или пароль.")
 
+        self.context['user'] = user
+
         return data
 
     def get_user(self):
