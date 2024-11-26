@@ -16,7 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from support.views import QuestionView, AnswerView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/questions/', QuestionView.as_view()),
+    path('api/questions/<int:author>/', QuestionView.as_view()),
+    path('api/answers/', AnswerView.as_view()),
+    path('api/answers/<int:responder>/', AnswerView.as_view())
 ]
