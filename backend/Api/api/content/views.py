@@ -1,9 +1,12 @@
 # Create your views here.
 from rest_framework import viewsets
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .models import *
 from .serializers import *
+# from users.permissions import IsModerator
 
 
 class GenreViewSet(viewsets.ViewSet):
@@ -123,12 +126,14 @@ class SongViewSet(viewsets.ViewSet):
 class AlbumViewSet(viewsets.ViewSet):
     serializer_class = AlbumSerializer
     queryset = Album.objects.all()
+    permission_classes = [IsAuthenticated]
 
     def list(self, request):
         albums = self.queryset.all()
         serializer = self.serializer_class(albums, many=True)
         return Response(serializer.data)
 
+    # @permission_classes(IsModerator)
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -187,6 +192,7 @@ class AlbumViewSet(viewsets.ViewSet):
 class ArtistViewSet(viewsets.ViewSet):
     serializer_class = ArtistSerializer
     queryset = Artist.objects.all()
+    permission_classes = [IsAuthenticated]
 
     def list(self, request):
         artists = self.queryset.all()

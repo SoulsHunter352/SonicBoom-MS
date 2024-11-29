@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import Song,Album,Artist,Playlist,Genre
+from .models import Song, Album, Artist, Playlist, Genre
 from django.contrib.auth import get_user_model
-from django.conf import settings
+
 
 class SongSerializer(serializers.ModelSerializer):
     artist = serializers.PrimaryKeyRelatedField(queryset=Artist.objects.all())
@@ -65,11 +65,14 @@ class ArtistSerializer(serializers.ModelSerializer):
 
 class AlbumSerializer(serializers.ModelSerializer):
     artist = serializers.PrimaryKeyRelatedField(queryset=Artist.objects.all())
+
     class Meta:
         model = Album
         fields = ['id', 'title', 'artist', 'description', 'picture']
+
     def create(self, validated_data):
         return Album.objects.create(**validated_data)
+
     def update(self, instance, validated_data):
         instance.title = validated_data.get('title', instance.title)
         instance.artist = validated_data.get('artist', instance.artist)
@@ -79,11 +82,8 @@ class AlbumSerializer(serializers.ModelSerializer):
         return instance
 
 
-from rest_framework import serializers
-from django.contrib.auth import get_user_model
-from .models import Playlist
-
 User = get_user_model()
+
 
 class PlaylistSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
