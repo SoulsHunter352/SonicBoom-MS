@@ -1,5 +1,3 @@
-from django.shortcuts import render
-
 # Create your views here.
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -13,7 +11,7 @@ class GenreViewSet(viewsets.ViewSet):
     queryset = Genre.objects.all()
 
     def list(self, request):
-        genres = self.queryset
+        genres = self.queryset.all()
         serializer = self.serializer_class(genres, many=True)
         return Response(serializer.data)
 
@@ -57,7 +55,7 @@ class SongViewSet(viewsets.ViewSet):
     queryset = Song.objects.all()
 
     def list(self, request):
-        tracks = self.queryset
+        tracks = self.queryset.all()
         serializer = self.serializer_class(tracks, many=True)
         return Response(serializer.data)
 
@@ -127,7 +125,7 @@ class AlbumViewSet(viewsets.ViewSet):
     queryset = Album.objects.all()
 
     def list(self, request):
-        albums = self.queryset
+        albums = self.queryset.all()
         serializer = self.serializer_class(albums, many=True)
         return Response(serializer.data)
 
@@ -191,7 +189,7 @@ class ArtistViewSet(viewsets.ViewSet):
     queryset = Artist.objects.all()
 
     def list(self, request):
-        artists = self.queryset
+        artists = self.queryset.all()
         serializer = self.serializer_class(artists, many=True)
         return Response(serializer.data)
 
@@ -264,7 +262,7 @@ class PlaylistViewSet(viewsets.ViewSet):
     queryset = Playlist.objects.all()
 
     def list(self, request):
-        playlists = self.queryset
+        playlists = self.queryset.all()
         serializer = self.serializer_class(playlists, many=True)
         return Response(serializer.data)
 
