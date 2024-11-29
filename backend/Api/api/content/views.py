@@ -7,6 +7,7 @@ from rest_framework import status
 from .models import *
 from .serializers import *
 
+
 class GenreViewSet(viewsets.ViewSet):
     serializer_class = GenreSerializer
     queryset = Genre.objects.all()
@@ -49,6 +50,8 @@ class GenreViewSet(viewsets.ViewSet):
             return Response()
         except Genre.DoesNotExist:
             return Response('НИХУЯ НЕ найдено')
+
+
 class SongViewSet(viewsets.ViewSet):
     serializer_class = SongSerializer
     queryset = Song.objects.all()
@@ -182,6 +185,7 @@ class AlbumViewSet(viewsets.ViewSet):
         except Album.DoesNotExist:
             return Response("ПЕСЕНОК НЕТ")
 
+
 class ArtistViewSet(viewsets.ViewSet):
     serializer_class = ArtistSerializer
     queryset = Artist.objects.all()
@@ -253,6 +257,8 @@ class ArtistViewSet(viewsets.ViewSet):
             return Response(serializer.data)
         except Artist.DoesNotExist:
             return Response("NOT_FOUND")
+
+
 class PlaylistViewSet(viewsets.ViewSet):
     serializer_class = PlaylistSerializer
     queryset = Playlist.objects.all()

@@ -7,20 +7,24 @@ class SongSerializer(serializers.ModelSerializer):
     artist = serializers.PrimaryKeyRelatedField(queryset=Artist.objects.all())
     album = serializers.PrimaryKeyRelatedField(many=True, queryset=Album.objects.all())
     genre = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all())
+
     class Meta:
         model = Song
         fields = [
-            'id', 'name', 'artist', 'album', 'genre','text', 'description', 'picture',]
-        def create(self,validated_data):
+            'id', 'name', 'artist', 'album', 'genre', 'track', 'text', 'description', 'picture',]
+
+        def create(self, validated_data):
             album = validated_data.pop('album', [])
             song = Song.objects.create(**validated_data)
             song.album.set(album)
             return song
-        def update(self,validated_data,instance):
+
+        def update(self, validated_data,instance):
             album = validated_data.pop('album',None)
             instance.name = validated_data.get('name', instance.name)
             instance.artist = validated_data.get('artist', instance.artist)
             instance.genre = validated_data.get('genre', instance.genre)
+            instance.track = validated_data.get('track', instance.track)
             instance.text = validated_data.get('text', instance.text)
             instance.description = validated_data.get('description', instance.description)
             instance.picture = validated_data.get('picture', instance.picture)
@@ -28,6 +32,8 @@ class SongSerializer(serializers.ModelSerializer):
             if album is not None:
                 instance.album.set(album)
             return instance
+
+
 class GenreSerializer(serializers.ModelSerializer):
     #name = serializers.CharField()
     class Meta:
@@ -39,19 +45,23 @@ class GenreSerializer(serializers.ModelSerializer):
         instance.name = validated_data.get('name', instance.name)
         instance.save()
         return instance
+
+
 class ArtistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Artist
-        fields = ['id', 'name', 'biography']
+        fields = ['id', 'name', 'picture', 'biography']
 
     def create(self, validated_data):
         return Artist.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
+        instance.picture = validated_data.get('picture', instance.picture)
         instance.biography = validated_data.get('biography', instance.biography)
         instance.save()
         return instance
+
 
 class AlbumSerializer(serializers.ModelSerializer):
     artist = serializers.PrimaryKeyRelatedField(queryset=Artist.objects.all())
