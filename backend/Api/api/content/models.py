@@ -1,3 +1,4 @@
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.conf import settings
 
@@ -55,7 +56,8 @@ class Song(models.Model):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='songs', name='artist')
     album = models.ManyToManyField(Album, related_name='songs', name='album', blank=True)
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='songs', name='genre')
-    track = models.FileField(upload_to='songs/', name='track')
+    track = models.FileField(upload_to='songs/', name='track',
+                             validators=[FileExtensionValidator(allowed_extensions=['mp3', 'mp4'])])
     text = models.CharField(max_length=1024, name='text', blank=True)
     description = models.CharField(max_length=1024, name='description', blank=True)
     picture = models.ImageField(upload_to='song_covers/', name='picture', blank=True)

@@ -36,3 +36,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'login'
     REQUIRED_FIELDS = ['username', 'email']
+
+    def is_admin(self):
+        return self.role == self.ADMIN
+
+    def is_moderator(self):
+        return self.role == self.MODERATOR
