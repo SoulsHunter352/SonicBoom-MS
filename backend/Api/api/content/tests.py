@@ -279,6 +279,11 @@ class AlbumViewSetTests(ViewSetTestsMixin, APITestCase):
         cls.update_valid['id'] = 1
         cls.update_valid['picture'] = '/media/album_covers/album2.jpg'
 
+        genre = Genre.objects.create(name='Рок')
+        music_content = b'music'
+        music_file = SimpleUploadedFile('test.mp3', music_content, content_type='audio/mpeg')
+        Song.objects.create(name='Track 1', artist=cls.artist, genre=genre, track=music_file)
+
     def test_create_valid(self):
         super().test_create_valid()
         self.model.objects.get(pk=self.create_valid['id']).picture.delete()
@@ -286,3 +291,12 @@ class AlbumViewSetTests(ViewSetTestsMixin, APITestCase):
     def test_update_valid(self):
         super().test_update_valid()
         self.model.objects.get(pk=self.update_valid['id']).picture.delete()
+
+    def test_songs_valid(self):
+        response = self.client.get(reverse('album-songs', kwargs={'pk': 1}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_songs_invalid(self):
+        response = self.client.get(reverse('album-songs', kwargs={'pk': 999}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+

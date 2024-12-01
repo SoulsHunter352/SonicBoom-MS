@@ -179,6 +179,7 @@ class AlbumViewSet(CustomPermissionMixin, viewsets.ViewSet):
         except Album.DoesNotExist:
             return Response("ХУЙ ТЕБЕ А НЕ УДАЛЕНИЕ", status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=True, methods=['get'])
     def songs(self, request, pk=None):
         try:
             album = Album.objects.get(pk=pk)
@@ -186,7 +187,7 @@ class AlbumViewSet(CustomPermissionMixin, viewsets.ViewSet):
             serializer = SongSerializer(songs, many=True)
             return Response(serializer.data)
         except Album.DoesNotExist:
-            return Response("ПЕСЕНОК НЕТ")
+            return Response("ПЕСЕНОК НЕТ", status=status.HTTP_404_NOT_FOUND)
 
 
 class ArtistViewSet(CustomPermissionMixin, viewsets.ViewSet):
