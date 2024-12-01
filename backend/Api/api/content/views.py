@@ -1,9 +1,10 @@
 # Create your views here.
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework import status
+
+from .mixins import CustomPermissionMixin
 from .models import *
 from .serializers import *
 # from users.permissions import IsModerator
@@ -139,7 +140,7 @@ class AlbumViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             album = serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
         try:
@@ -156,7 +157,7 @@ class AlbumViewSet(viewsets.ViewSet):
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Album.DoesNotExist:
             return Response("ОБНОВЛЕНИЯ НИ БУДИИИИИИИИИИИТ")
 
@@ -167,7 +168,7 @@ class AlbumViewSet(viewsets.ViewSet):
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Album.DoesNotExist:
             return Response('ТАКОГО ОБНОЛВЕНИЯ ТОЖЕ НИ БУДИИИИИТ')
 
@@ -189,10 +190,18 @@ class AlbumViewSet(viewsets.ViewSet):
             return Response("ПЕСЕНОК НЕТ")
 
 
-class ArtistViewSet(viewsets.ViewSet):
+class ArtistViewSet(CustomPermissionMixin, viewsets.ViewSet):
     serializer_class = ArtistSerializer
     queryset = Artist.objects.all()
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+
+    """
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return [AllowAny()]
+        else:
+            return [IsAuthenticated()]
+    """
 
     def list(self, request):
         artists = self.queryset.all()
@@ -204,7 +213,7 @@ class ArtistViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             artist = serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
         try:
@@ -212,7 +221,7 @@ class ArtistViewSet(viewsets.ViewSet):
             serializer = self.serializer_class(artist)
             return Response(serializer.data)
         except Artist.DoesNotExist:
-            return Response("ХУЙ ТЕБЕ А НЕ АРТИСТ")
+            return Response("ХУЙ ТЕБЕ А НЕ АРТИСТ", status=status.HTTP_404_NOT_FOUND)
 
     def update(self, request, pk=None):
         try:
@@ -221,9 +230,9 @@ class ArtistViewSet(viewsets.ViewSet):
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Artist.DoesNotExist:
-            return Response("ПУШКИН ЗАСТРЕЛИЛСЯ")
+            return Response("ПУШКИН ЗАСТРЕЛИЛСЯ", status=status.HTTP_404_NOT_FOUND)
 
     def partial_update(self, request, pk=None):
         try:
@@ -232,9 +241,9 @@ class ArtistViewSet(viewsets.ViewSet):
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Artist.DoesNotExist:
-            return Response("ПУШКИН ЗАСТРЕЛИЛСЯ V2")
+            return Response("ПУШКИН ЗАСТРЕЛИЛСЯ V2", status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, pk=None):
         try:
@@ -242,7 +251,7 @@ class ArtistViewSet(viewsets.ViewSet):
             artist.delete()
             return Response()
         except Artist.DoesNotExist:
-            return Response("НЕЧЕГО УДАЛЯТЬ, ДЕБИЛ")
+            return Response("НЕЧЕГО УДАЛЯТЬ, ДЕБИЛ", status=status.HTTP_404_NOT_FOUND)
 
     def tracks(self, request, pk=None):
         try:
