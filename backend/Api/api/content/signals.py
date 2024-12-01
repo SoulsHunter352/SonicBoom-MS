@@ -19,6 +19,7 @@ def delete_artist_picture(sender, **kwargs):
 def delete_album_picture(sender, **kwargs):
     instance = kwargs.get('instance')
     if instance.picture:
+        # print('Куку')
         if instance.picture.name != ALBUM_DEFAULT:
             instance.picture.delete()
 
