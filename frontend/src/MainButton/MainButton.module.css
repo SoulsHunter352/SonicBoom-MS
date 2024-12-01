@@ -1,0 +1,18 @@
+.main-btn {
+  border: none;
+  background-color: unset;
+  padding: 0.5rem;
+  border-radius: 2rem;
+  text-align: center;
+  cursor: pointer;
+  color: white;
+  font-weight: bolder;
+}
+
+.main-btn:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.main-btn:focus {
+  background-color: rgba(0, 0, 0, 0.5);
+}
