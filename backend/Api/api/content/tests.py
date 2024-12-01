@@ -9,8 +9,16 @@ from rest_framework.test import APITestCase
 
 from PIL import Image
 
+from .mixins import ViewSetTestsMixin
 from .models import Artist, Album, Genre, Song
 from .serializers import ArtistSerializer, AlbumSerializer
+
+
+def create_image():
+    image_data = BytesIO()
+    Image.new('RGB', (100, 100)).save(image_data, 'PNG')
+    image_data.seek(0)
+    return image_data
 
 
 class ArtistSerializerTests(APITestCase):
@@ -218,3 +226,36 @@ class ArtistViewSetTests(APITestCase):
         response = self.client.get(self.wrong_url + '/tracks/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+
+class AlbumViewSetTests(ViewSetTestsMixin, APITestCase):
+    model = Album
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.list_url = reverse('album-list')
+        cls.detail_url = reverse('album-detail', kwargs={'pk': 1})
+        super().setUpTestData()
+        cls.image = create_image()
+
+        cls.artist = Artist.objects.create(name='New Artist', biography='')
+
+        Album.objects.create(**{
+            'title': 'New Album',
+            'artist': cls.artist,
+            'description': 'Album',
+            'picture': SimpleUploadedFile('album1.jpg', cls.image.getvalue())
+        })
+
+        cls.create_data = {
+            'title': 'New Album',
+            'artist': cls.artist,
+            'description': 'Album',
+            'picture': SimpleUploadedFile('album2.jpg', cls.image.getvalue())
+        }
+        cls.create_valid = {
+            'id': 2,
+            'title': 'New Album',
+            'artist': 1,
+            'description': 'Album',
+            'picture': '/media/album_covers/album2.jpg'
+        }

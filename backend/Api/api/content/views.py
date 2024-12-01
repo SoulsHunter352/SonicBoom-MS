@@ -124,10 +124,9 @@ class SongViewSet(viewsets.ViewSet):
             return Response(".!. тебе а не альбомы")
 
 
-class AlbumViewSet(viewsets.ViewSet):
+class AlbumViewSet(CustomPermissionMixin, viewsets.ViewSet):
     serializer_class = AlbumSerializer
     queryset = Album.objects.all()
-    permission_classes = [IsAuthenticated]
 
     def list(self, request):
         albums = self.queryset.all()
