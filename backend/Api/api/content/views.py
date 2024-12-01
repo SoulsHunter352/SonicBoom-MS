@@ -1,6 +1,6 @@
 # Create your views here.
 from rest_framework import viewsets, status
-from rest_framework.decorators import permission_classes
+from rest_framework.decorators import permission_classes, action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
@@ -253,15 +253,17 @@ class ArtistViewSet(CustomPermissionMixin, viewsets.ViewSet):
         except Artist.DoesNotExist:
             return Response("НЕЧЕГО УДАЛЯТЬ, ДЕБИЛ", status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=True, methods=['get'])
     def tracks(self, request, pk=None):
         try:
             artist = Artist.objects.get(pk=pk)
-            tracks = artist.song.all()
+            tracks = artist.songs.all()
             serializer = SongSerializer(tracks, many=True)
             return Response(serializer.data)
         except Artist.DoesNotExist:
-            return Response("NOT_FOUND")
+            return Response("NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=True, methods=['get'])
     def albums(self, request, pk=None):
         try:
             artist = Artist.objects.get(pk=pk)
@@ -269,7 +271,7 @@ class ArtistViewSet(CustomPermissionMixin, viewsets.ViewSet):
             serializer = AlbumSerializer(albums, many=True)
             return Response(serializer.data)
         except Artist.DoesNotExist:
-            return Response("NOT_FOUND")
+            return Response("NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
 
 
 class PlaylistViewSet(viewsets.ViewSet):
