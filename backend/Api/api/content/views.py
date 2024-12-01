@@ -147,7 +147,7 @@ class AlbumViewSet(CustomPermissionMixin, viewsets.ViewSet):
             serializer = self.serializer_class(album)
             return Response(serializer.data)
         except Album.DoesNotExist:
-            return Response("АЛЬБОМА НИ БУДИИИИИИИИИИТ")
+            return Response("АЛЬБОМА НИ БУДИИИИИИИИИИТ", status=status.HTTP_404_NOT_FOUND)
 
     def update(self, request, pk=None):
         try:
@@ -158,7 +158,7 @@ class AlbumViewSet(CustomPermissionMixin, viewsets.ViewSet):
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Album.DoesNotExist:
-            return Response("ОБНОВЛЕНИЯ НИ БУДИИИИИИИИИИИТ")
+            return Response("ОБНОВЛЕНИЯ НИ БУДИИИИИИИИИИИТ", status=status.HTTP_404_NOT_FOUND)
 
     def partial_update(self, request, pk=None):
         try:
@@ -169,15 +169,15 @@ class AlbumViewSet(CustomPermissionMixin, viewsets.ViewSet):
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Album.DoesNotExist:
-            return Response('ТАКОГО ОБНОЛВЕНИЯ ТОЖЕ НИ БУДИИИИИТ')
+            return Response('ТАКОГО ОБНОЛВЕНИЯ ТОЖЕ НИ БУДИИИИИТ', status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, pk=None):
         try:
             album = Album.objects.get(pk=pk)
             album.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response()
         except Album.DoesNotExist:
-            return Response("ХУЙ ТЕБЕ А НЕ УДАЛЕНИЕ")
+            return Response("ХУЙ ТЕБЕ А НЕ УДАЛЕНИЕ", status=status.HTTP_404_NOT_FOUND)
 
     def songs(self, request, pk=None):
         try:
@@ -193,14 +193,6 @@ class ArtistViewSet(CustomPermissionMixin, viewsets.ViewSet):
     serializer_class = ArtistSerializer
     queryset = Artist.objects.all()
     # permission_classes = [IsAuthenticated]
-
-    """
-    def get_permissions(self):
-        if self.action == 'retrieve':
-            return [AllowAny()]
-        else:
-            return [IsAuthenticated()]
-    """
 
     def list(self, request):
         artists = self.queryset.all()

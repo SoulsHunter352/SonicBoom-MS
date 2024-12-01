@@ -229,11 +229,12 @@ class ArtistViewSetTests(APITestCase):
 
 class AlbumViewSetTests(ViewSetTestsMixin, APITestCase):
     model = Album
+    list_url = reverse('album-list')
+    detail_url = reverse('album-detail', kwargs={'pk': 1})
+    wrong_url = reverse('album-detail', kwargs={'pk': 999})
 
     @classmethod
     def setUpTestData(cls):
-        cls.list_url = reverse('album-list')
-        cls.detail_url = reverse('album-detail', kwargs={'pk': 1})
         super().setUpTestData()
         cls.image = create_image()
 
@@ -247,15 +248,41 @@ class AlbumViewSetTests(ViewSetTestsMixin, APITestCase):
         })
 
         cls.create_data = {
-            'title': 'New Album',
-            'artist': cls.artist,
+            'title': 'New Album2',
+            'artist': cls.artist.pk,
             'description': 'Album',
             'picture': SimpleUploadedFile('album2.jpg', cls.image.getvalue())
         }
         cls.create_valid = {
             'id': 2,
-            'title': 'New Album',
-            'artist': 1,
+            'title': 'New Album2',
+            'artist': cls.artist.pk,
             'description': 'Album',
             'picture': '/media/album_covers/album2.jpg'
         }
+
+        cls.retrieve_data = {
+            'id': 1,
+            'title': 'New Album',
+            'artist': cls.artist.pk,
+            'description': 'Album',
+            'picture': '/media/album_covers/album1.jpg'
+        }
+
+        cls.partial_data = {
+            'title': 'Album'
+        }
+        cls.partial_valid_data = cls.retrieve_data.copy()
+        cls.partial_valid_data['title'] = 'Album'
+        cls.update_data = cls.create_data.copy()
+        cls.update_valid = cls.create_data.copy()
+        cls.update_valid['id'] = 1
+        cls.update_valid['picture'] = '/media/album_covers/album2.jpg'
+
+    def test_create_valid(self):
+        super().test_create_valid()
+        self.model.objects.get(pk=self.create_valid['id']).picture.delete()
+
+    def test_update_valid(self):
+        super().test_update_valid()
+        self.model.objects.get(pk=self.update_valid['id']).picture.delete()
