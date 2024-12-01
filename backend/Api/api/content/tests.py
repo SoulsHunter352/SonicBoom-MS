@@ -1,12 +1,15 @@
 from io import BytesIO
 from tkinter import Image
 
+from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from rest_framework.test import APIClient, APITestCase
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
 
 from PIL import Image
 
-from .models import Artist, Album
+from .models import Artist, Album, Genre, Song
 from .serializers import ArtistSerializer, AlbumSerializer
 
 
@@ -75,3 +78,143 @@ class AlbumSerializerTests(APITestCase):
         serializer = AlbumSerializer(instance=album, data={'title': None}, partial=True)
         self.assertEqual(serializer.is_valid(), False)
         album.picture.delete()  # Удаление картинки после теста
+
+
+class ArtistViewSetTests(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = get_user_model().objects.create_user(login='test', email='test@gmail.com', username='user',
+                                                        password='12345699uq', role=get_user_model().ADMIN)
+        cls.list_url = reverse('artist-list')
+        cls.detail_url = reverse('artist-detail', kwargs={'pk': 1})
+
+        image_data = BytesIO()
+        Image.new('RGB', (100, 100)).save(image_data, 'PNG')
+        image_data.seek(0)
+
+        cls.image = SimpleUploadedFile('album.jpg', image_data.getvalue())
+        data = {'name': 'New Artist', 'biography': ''}
+        cls.artist = Artist.objects.create(**data)
+
+        album_image = SimpleUploadedFile('album.jpg', image_data.getvalue())
+        Album.objects.create(title='Album 1', artist=cls.artist, description='Альбом', picture=album_image)
+        album_image = SimpleUploadedFile('album2.jpg', image_data.getvalue())
+        Album.objects.create(title='Album 2', artist=cls.artist, description='Альбом', picture=album_image)
+
+        genre = Genre.objects.create(name='Рок')
+
+        music_content = b'music'
+        music_file = SimpleUploadedFile('test.mp3',music_content, content_type='audio/mpeg')
+        Song.objects.create(name='Track 1', artist=cls.artist, genre=genre, track=music_file)
+        music_file = SimpleUploadedFile('test.mp3', music_content, content_type='audio/mpeg')
+        Song.objects.create(name='Track 2', artist=cls.artist, genre=genre, track=music_file)
+
+        cls.wrong_url = reverse('artist-detail', kwargs={'pk': 999})
+
+    def setUp(self):
+        self.client.login(username=self.user.login, password='12345699uq')
+
+    def test_list_valid(self):
+        response = self.client.get(self.list_url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_list_guest(self):
+        self.client.logout()
+        response = self.client.get(self.list_url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_valid(self):
+        data = {'name': 'New Artist2', 'picture': self.image, 'biography': ''}
+        response = self.client.post(self.list_url, data=data, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data['id'] = 2
+        data['picture'] = '/media/artist_covers/album.jpg'
+        data['biography'] = ''
+        self.assertEqual(response.data, data)
+        Artist.objects.get(pk=data['id']).picture.delete()
+
+    def test_create_invalid(self):
+        data = {}
+        response = self.client.post(self.list_url, data=data, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_valid(self):
+        data = {'name': 'Updated Artist', 'biography': '', 'picture': self.image}
+        # artist = Artist.objects.create(**data)
+        response = self.client.put(
+            self.detail_url,
+            data=data,
+            format='multipart'
+        )
+
+        data['id'] = 1
+        # data['name'] = 'Updated Artist'
+        data['picture'] = '/media/artist_covers/album.jpg'
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, data)
+        artist = Artist.objects.get(pk=1)
+        artist.picture.delete()
+
+    def test_update_invalid(self):
+        response = self.client.put(
+            reverse('artist-detail', kwargs={'pk': 999}),
+            data={'name': 'Updated Artist', 'picture': self.image, 'biography': ''},
+            format='multipart'
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_partial_update_valid(self):
+        data = {'id': 1, 'name': 'Updated Artist', 'biography': '', 'picture': '/media/defaults/artist_default.png'}
+        # artist = Artist.objects.create(**data)
+        response = self.client.patch(
+            self.detail_url,
+            data={'name': 'Updated Artist'},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, data)
+
+    def test_partial_update_invalid(self):
+        response = self.client.put(
+            reverse('artist-detail', kwargs={'pk': 999}),
+            data={'name': 'Updated Artist'},
+            format='multipart'
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_retrieve_valid(self):
+        response = self.client.get(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data,
+            {'id': 1, 'name': 'New Artist', 'biography': '', 'picture': '/media/defaults/artist_default.png'}
+        )
+
+    def test_retrieve_invalid(self):
+        response = self.client.get(reverse('artist-detail', kwargs={'pk': 999}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_valid(self):
+        response = self.client.delete(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_delete_invalid(self):
+        response = self.client.delete(self.wrong_url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_albums_valid(self):
+        response = self.client.get(reverse('artist-albums', kwargs={'pk': 1}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_albums_invalid(self):
+        response = self.client.get(self.wrong_url + '/albums/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_tracks_valid(self):
+        response = self.client.get(reverse('artist-tracks', kwargs={'pk': 1}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_tracks_invalid(self):
+        response = self.client.get(self.wrong_url + '/tracks/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+

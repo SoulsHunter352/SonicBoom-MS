@@ -35,8 +35,9 @@ def update_artist_picture(sender, **kwargs):
     except Artist.DoesNotExist:
         return
     new_image = instance.picture
-    print(old_image.name, new_image.name)
+    # print(old_image.name, new_image.name)
     if old_image and old_image.name != ARTIST_DEFAULT and old_image.name != new_image.name:
+        # print('Удалили', old_image.name)
         old_image.delete(save=False)
 
 
@@ -52,6 +53,6 @@ def update_album_picture(sender, instance, **kwargs):
     except Album.DoesNotExist:
         return
     new_image = instance.picture
-    print(old_image.name, new_image.name)
+    # print(old_image.name, new_image.name)
     if old_image and old_image.name != ALBUM_DEFAULT and old_image.name != new_image.name:
         old_image.delete(save=False)
