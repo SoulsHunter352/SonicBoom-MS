@@ -10,7 +10,7 @@ from .serializers import *
 # from users.permissions import IsModerator
 
 
-class GenreViewSet(viewsets.ViewSet):
+class GenreViewSet(CustomPermissionMixin,viewsets.ViewSet):
     serializer_class = GenreSerializer
     queryset = Genre.objects.all()
 
@@ -24,7 +24,7 @@ class GenreViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             genre = serializer.save()
             return Response(self.serializer_class(genre).data)
-        return Response(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
         try:
@@ -32,7 +32,7 @@ class GenreViewSet(viewsets.ViewSet):
             serializer = self.serializer_class(genre)
             return Response(serializer.data)
         except Genre.DoesNotExist:
-            return Response('НИХУЯ Не найдено')
+            return Response('Ничего Не найдено', status=status.HTTP_404_NOT_FOUND)
 
     def update(self, request, pk=None):
         try:
@@ -41,9 +41,9 @@ class GenreViewSet(viewsets.ViewSet):
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
-            return Response(serializer.errors)
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         except Genre.DoesNotExist:
-            return Response('НИХУЯ Не найдено')
+            return Response('Ничего Не найдено',status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, pk=None):
         try:
@@ -51,10 +51,20 @@ class GenreViewSet(viewsets.ViewSet):
             genre.delete()
             return Response()
         except Genre.DoesNotExist:
-            return Response('НИХУЯ НЕ найдено')
+            return Response('Ничего НЕ найдено',status=status.HTTP_404_NOT_FOUND)
 
+    def partial_update(self, request, pk=None):
+        try:
+            genre = Genre.objects.get(pk=pk)
+            serializer = self.serializer_class(genre, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors)
+        except Genre.DoesNotExist:
+            return Response("Genre Ничего НЕ EXISTS", status=status.HTTP_404_NOT_FOUND)
 
-class SongViewSet(viewsets.ViewSet):
+class SongViewSet(CustomPermissionMixin,viewsets.ViewSet):
     serializer_class = SongSerializer
     queryset = Song.objects.all()
 
@@ -68,7 +78,7 @@ class SongViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             song = serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
         try:
@@ -76,7 +86,7 @@ class SongViewSet(viewsets.ViewSet):
             serializer = self.serializer_class(song)
             return Response(serializer.data)
         except Song.DoesNotExist:
-            return Response('НИ-ХУ-Я НЕ НАЙДЕНО')
+            return Response('Ничего НЕ НАЙДЕНО',status=status.HTTP_404_NOT_FOUND)
 
     def update(self, request, pk=None):
         try:
@@ -85,9 +95,9 @@ class SongViewSet(viewsets.ViewSet):
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
-            return Response(serializer.errors)
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         except Song.DoesNotExist:
-            return Response("НИ-ХУ-Я НЕ НАЙДЕНО")
+            return Response("Ничего НЕ НАЙДЕНО",status=status.HTTP_404_NOT_FOUND)
 
     def partial_update(self, request, pk=None):
         """
@@ -99,9 +109,9 @@ class SongViewSet(viewsets.ViewSet):
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
-            return Response(serializer.errors)
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         except Song.DoesNotExist:
-            return Response("SONG НИХУЯ НЕ EXISTS")
+            return Response("SONG Ничего НЕ EXISTS",status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, pk=None):
         """
@@ -112,8 +122,9 @@ class SongViewSet(viewsets.ViewSet):
             song.delete()
             return Response()
         except Song.DoesNotExist:
-            return Response("SONG НИХУЯ НЕ EXISTS")
+            return Response("SONG Ничего НЕ EXISTS",status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=True, methods=['get'])
     def albums(self, request, pk=None):
         try:
             song = Song.objects.get(pk=pk)
@@ -121,7 +132,7 @@ class SongViewSet(viewsets.ViewSet):
             serializer = AlbumSerializer(albums, many=True)
             return Response(serializer.data)
         except Song.DoesNotExist:
-            return Response(".!. тебе а не альбомы")
+            return Response("Нет альбомов",status=status.HTTP_404_NOT_FOUND)
 
 
 class AlbumViewSet(CustomPermissionMixin, viewsets.ViewSet):
@@ -177,7 +188,7 @@ class AlbumViewSet(CustomPermissionMixin, viewsets.ViewSet):
             album.delete()
             return Response()
         except Album.DoesNotExist:
-            return Response("ХУЙ ТЕБЕ А НЕ УДАЛЕНИЕ", status=status.HTTP_404_NOT_FOUND)
+            return Response("не получилось удалить", status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=True, methods=['get'])
     def songs(self, request, pk=None):
@@ -213,7 +224,7 @@ class ArtistViewSet(CustomPermissionMixin, viewsets.ViewSet):
             serializer = self.serializer_class(artist)
             return Response(serializer.data)
         except Artist.DoesNotExist:
-            return Response("ХУЙ ТЕБЕ А НЕ АРТИСТ", status=status.HTTP_404_NOT_FOUND)
+            return Response("артиста нет", status=status.HTTP_404_NOT_FOUND)
 
     def update(self, request, pk=None):
         try:
@@ -224,7 +235,7 @@ class ArtistViewSet(CustomPermissionMixin, viewsets.ViewSet):
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Artist.DoesNotExist:
-            return Response("ПУШКИН ЗАСТРЕЛИЛСЯ", status=status.HTTP_404_NOT_FOUND)
+            return Response("артиста нет", status=status.HTTP_404_NOT_FOUND)
 
     def partial_update(self, request, pk=None):
         try:
@@ -235,7 +246,7 @@ class ArtistViewSet(CustomPermissionMixin, viewsets.ViewSet):
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Artist.DoesNotExist:
-            return Response("ПУШКИН ЗАСТРЕЛИЛСЯ V2", status=status.HTTP_404_NOT_FOUND)
+            return Response("артиста нет V2", status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, pk=None):
         try:
@@ -243,7 +254,7 @@ class ArtistViewSet(CustomPermissionMixin, viewsets.ViewSet):
             artist.delete()
             return Response()
         except Artist.DoesNotExist:
-            return Response("НЕЧЕГО УДАЛЯТЬ, ДЕБИЛ", status=status.HTTP_404_NOT_FOUND)
+            return Response("НЕЧЕГО УДАЛЯТЬ", status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=True, methods=['get'])
     def tracks(self, request, pk=None):
@@ -266,7 +277,7 @@ class ArtistViewSet(CustomPermissionMixin, viewsets.ViewSet):
             return Response("NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
 
 
-class PlaylistViewSet(viewsets.ViewSet):
+class PlaylistViewSet(CustomPermissionMixin,viewsets.ViewSet):
     serializer_class = PlaylistSerializer
     queryset = Playlist.objects.all()
 
@@ -280,7 +291,7 @@ class PlaylistViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             playlist = serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
         try:
@@ -288,7 +299,7 @@ class PlaylistViewSet(viewsets.ViewSet):
             serializer = self.serializer_class(playlist)
             return Response(serializer.data)
         except Playlist.DoesNotExist:
-            return Response("NOT FOUND")
+            return Response("NOT FOUND",status=status.HTTP_404_NOT_FOUND)
 
     def update(self, request, pk=None):
         try:
@@ -297,9 +308,9 @@ class PlaylistViewSet(viewsets.ViewSet):
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
-            return Response(serializer.errors)
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         except Playlist.DoesNotExist:
-            return Response("NOT FOUND")
+            return Response("NOT FOUND",status=status.HTTP_404_NOT_FOUND)
 
     def partial_update(self, request, pk=None):
         try:
@@ -308,9 +319,9 @@ class PlaylistViewSet(viewsets.ViewSet):
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
-            return Response(serializer.errors)
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         except Playlist.DoesNotExist:
-            return Response("NOT FOUND")
+            return Response("NOT FOUND",status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, pk=None):
         try:
@@ -318,8 +329,9 @@ class PlaylistViewSet(viewsets.ViewSet):
             playlist.delete()
             return Response()
         except Playlist.DoesNotExist:
-            return Response("NOT EXI")
+            return Response("NOT EXI",status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=True, methods=['get'])
     def tracks(self, request, pk=None):
         try:
             playlist = Playlist.objects.get(pk=pk)
@@ -327,4 +339,4 @@ class PlaylistViewSet(viewsets.ViewSet):
             serializer = SongSerializer(tracks, many=True)
             return Response(serializer.data)
         except Playlist.DoesNotExist:
-            return Response("not found")
+            return Response("not found",status=status.HTTP_404_NOT_FOUND)
