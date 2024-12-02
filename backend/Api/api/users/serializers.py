@@ -43,26 +43,30 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     def validate(self, data):
         """
         Проверяем совпадение password1 и password2.
+        Удаляем поле password2 из данных.
         """
         if data['password1'] != data['password2']:
-            raise serializers.ValidationError({"password": "Пароли не совпадают."})
+            raise serializers.ValidationError({"password2": "Пароли не совпадают."})
+
+        # Удаляем password2, так как оно больше не нужно
+        data.pop('password2', None)
         return data
 
     def create(self, validated_data):
         """
         Создаем нового пользователя с проверенными данными.
         """
-        # Удаляем лишние данные, которые не нужны для создания пользователя
+        # Извлекаем пароль
         password = validated_data.pop('password1')
-        validated_data.pop('password2')
 
-        # Создаем пользователя через метод модели
+        # Создаем пользователя с помощью метода менеджера модели
         user = User.objects.create_user(
-            login=validated_data['login'],
-            email=validated_data['email'],
-            username=validated_data['username'],
-            password=password
+            login=validated_data['login'],  # Уникальный логин
+            username=validated_data['username'],  # Никнейм пользователя
+            email=validated_data['email'],  # Email пользователя
+            password=password  # Устанавливаем пароль
         )
+
         return user
 
 
