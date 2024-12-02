@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 
 from django.conf.global_settings import MEDIA_ROOT
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     # 'rest_framework_simplejwt',
+    'rest_framework.authtoken',
     'users.apps.UsersConfig',
     'content'
 ]
@@ -139,10 +140,15 @@ AUTHENTICATION_BACKENDS = [
     "users.backends.EmailBackend",
 ]
 
-"""
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ],
 }
-"""
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),  # Жизнь токена доступа
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Жизнь рефреш-токена
+    'ROTATE_REFRESH_TOKENS': False,  # Указывает, нужно ли обновлять рефреш-токен
+    'BLACKLIST_AFTER_ROTATION': True,
+}

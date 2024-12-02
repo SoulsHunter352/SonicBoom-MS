@@ -1,5 +1,6 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.contrib.auth import login, logout
@@ -7,19 +8,14 @@ from .models import User
 from .serializers import UserSerializer, LoginSerializer, RegisterUserSerializer, ChangePasswordSerializer
 
 
+
 # Create your views here.
 class UserViewSet(viewsets.ViewSet):
-    queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
-    def get_object(self, pk):
-        try:
-            object = self.queryset.get(pk=pk)
-            return object
-        except:
-            return None
-        # return self.queryset.get(pk=self.kwargs['pk'])
+    def get_queryset(self):
+        return User.objects.all()
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -32,36 +28,83 @@ class UserViewSet(viewsets.ViewSet):
         """
         Возвращает список всех пользователей.
         """
-        users = self.queryset
+        users = self.get_queryset()
         serializer = self.serializer_class(users, many=True)
         return Response(serializer.data)
 
     def create(self, request):
-        # создает нового пользователя
-        return Response
+        """
+        Создает нового пользователя.
+        """
+        serializer = RegisterUserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response(
+                {"message": "Пользователь успешно создан", "user": UserSerializer(user).data},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk=None):
-        # изменение данных пользователя(полностью изменяет объект)
-        return Response
+        """
+        Полное обновление данных пользователя.
+        """
+        instance = get_object_or_404(self.get_queryset(), pk=pk)
+        if not instance:
+            return Response({"error": "Пользователь не найден"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.serializer_class(instance, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, pk=None):
-        # изменение данных пользователя(частичное изменение)
-        return Response
+        """
+        Частичное обновление данных пользователя.
+        """
+        instance = get_object_or_404(self.get_queryset(), pk=pk)
+        if not instance:
+            return Response({"error": "Пользователь не найден"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.serializer_class(instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
-        # возвращает данные об отдельном пользователе
-        instance = self.get_object(pk)
+        """
+        Возвращает данные конкретного пользователя по его ID.
+        """
+        instance = get_object_or_404(self.get_queryset(), pk=pk)
         if not instance:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        return Response(self.serializer_class(instance).data, status=status.HTTP_200_OK)
+            return Response({"error": "Пользователь не найден"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.serializer_class(instance)
+        return Response(serializer.data)
 
     def delete(self, request, pk=None):
-        # удаление пользователя
-        return Response
+        """
+        Удаляет пользователя.
+        """
+        instance = get_object_or_404(self.get_queryset(), pk=pk)
+        if not instance:
+            return Response({"error": "Пользователь не найден"}, status=status.HTTP_404_NOT_FOUND)
 
+        instance.delete()
+        return Response({"message": "Пользователь успешно удален"}, status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def change_password(self, request):
-        # изменение пароля авторизованного пользователя
-        return Response
+        """
+        Изменение пароля авторизованного пользователя.
+        """
+        user = request.user
+        serializer = self.get_serializer_class()(instance=user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Пароль успешно изменен"}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -72,14 +115,11 @@ def login_view(request):
     """
     serializer = LoginSerializer(data=request.data)
     if serializer.is_valid():
-        # Получаем аутентифицированного пользователя из сериализатора
         user = serializer.get_user()
 
-        # Выполняем вход в систему
         login(request, user, backend='django.contrib.auth.backends.ModelBackend')
         return Response({"message": "Вы успешно вошли в систему!"}, status=status.HTTP_200_OK)
 
-    # Возвращаем ошибки сериализатора, если данные невалидны
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
