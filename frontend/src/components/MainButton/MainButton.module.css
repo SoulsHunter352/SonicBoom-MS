@@ -5,14 +5,14 @@
   border-radius: 2rem;
   text-align: center;
   cursor: pointer;
-  color: white;
+  color: rgb(60, 60, 60);
   font-weight: bolder;
 }
 
 .main-btn:hover {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .main-btn:focus {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.2);
 }

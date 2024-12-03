@@ -1,5 +1,5 @@
 import "./styles.css";
-import Header from "./Header/Header";
+import Header from "./components/Header/Header";
 import { useState } from "react";
 
 export default function App() {
