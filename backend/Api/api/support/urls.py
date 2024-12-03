@@ -3,7 +3,7 @@ from rest_framework import routers
 from .views import *
 
 router = routers.SimpleRouter()
-router.register(r'genre', AnswerView)
-router.register(r'song', QuestionView)
+router.register(r'answers', AnswerView)
+router.register(r'questions', QuestionView)
 urlpatterns = []
 urlpatterns += router.urls
