@@ -11,8 +11,13 @@ i {
   padding: 0 !important;
 }
 
+hr {
+  border-color: rgba(234, 234, 234, 0.27);
+}
+
 label,
-button {
+button,
+img {
   -webkit-user-select: none;
   user-select: none;
 }
