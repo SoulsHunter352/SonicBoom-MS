@@ -57,10 +57,10 @@ class Song(models.Model):
     album = models.ManyToManyField(Album, related_name='songs', name='album', blank=True)
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='songs', name='genre')
     track = models.FileField(upload_to='songs/', name='track',
-                             validators=[FileExtensionValidator(allowed_extensions=['mp3', 'mp4'])])
+                             validators=[FileExtensionValidator(allowed_extensions=['mp3', 'mp4'])],default='defaults/song_track_default.mp3')
     text = models.CharField(max_length=1024, name='text', blank=True)
     description = models.CharField(max_length=1024, name='description', blank=True)
-    picture = models.ImageField(upload_to='song_covers/', name='picture', blank=True)
+    picture = models.ImageField(upload_to='song_covers/', name='picture', blank=True,default='defaults/song_default.png')
 
 
 class Playlist(models.Model):
@@ -73,6 +73,6 @@ class Playlist(models.Model):
     """
     title = models.CharField(max_length=60, name='title', db_index=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='playlists', name='user')
-    song = models.ManyToManyField(Song, related_name='playlists', name='song')
-    picture = models.ImageField(upload_to='playlist_covers/', name='picture', blank=True)
+    song = models.ManyToManyField(Song, related_name='playlists', name='song',blank=True)
+    picture = models.ImageField(upload_to='playlist_covers/', name='picture', blank=True,default='defaults/playlist_default.png')
 
