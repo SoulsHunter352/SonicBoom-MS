@@ -28,7 +28,9 @@ SECRET_KEY = 'django-insecure-3c2ft8hzpsqhndlf1vvnv+i-h%fee%-6d+9_t2o8!s!s7cfu2d
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
 
 # Application definition
 
@@ -40,10 +42,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
     # 'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'users.apps.UsersConfig',
-    'content'
+    'content',
+    'support'
 ]
 
 MIDDLEWARE = [
@@ -112,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 

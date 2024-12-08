@@ -14,13 +14,13 @@ class Question(models.Model):
 
     STATUSES = (
         (OPEN, 'OPEN'),
-        (CLOSED, 'CLOSED'),
+        (CLOSED, 'CLOSED')
     )
     
-    author = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name='questions',)
+    author = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name='questions')
     question_text = models.TextField(verbose_name="Текст вопроса")
     created_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=6, choices=STATUSES, default=OPEN)
+    status = models.CharField(max_length=10, choices=STATUSES, default=OPEN)
 
 
 class Answer(models.Model):
@@ -31,7 +31,7 @@ class Answer(models.Model):
     question - связь с вопросом
     created_at - дата создания
     """
-    responder = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name='answers', )
+    responder = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name='answers')
     answer_text = models.TextField(verbose_name="Текст ответа")
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
-    created_at = models.DateTimeField(auto_now=True, dp_index=True)
+    created_at = models.DateTimeField(auto_now=True)
