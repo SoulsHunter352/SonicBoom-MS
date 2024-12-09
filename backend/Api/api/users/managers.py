@@ -16,7 +16,7 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_user(self, login, password, username, email, **other_fields):
-        """
+        """ 
         Функция создания обычного пользователя
         """
         other_fields.setdefault('is_superuser', False)

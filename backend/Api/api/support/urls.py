@@ -5,5 +5,7 @@ from .views import *
 router = routers.SimpleRouter()
 router.register(r'answers', AnswerView)
 router.register(r'questions', QuestionView)
+
 urlpatterns = []
+
 urlpatterns += router.urls
