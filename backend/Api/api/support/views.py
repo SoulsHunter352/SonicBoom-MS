@@ -1,42 +1,99 @@
 from django.shortcuts import render
-from rest_framework import generics, status
+from rest_framework import generics, status, viewsets
 from rest_framework.response import Response
 from .models import Question, Answer
 from .serializers import QuestionSerializer, AnswerSerializer
+from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import ValidationError
 
 
-
-# class QuestionView(generics.ListAPIView):
-#     queryset = Question.objects.all()
-#     serializer_class = QuestionSerializer
-
-
-class QuestionView(generics.ListAPIView):
+class QuestionView(viewsets.ViewSet):
     serializer_class = QuestionSerializer
+    queryset = Question.objects.all()
 
+    def list(self, request):
+        filter_params = request.query_params
 
-    def get_queryset(self):
-        author_id = self.kwargs.get('author')
-        if author_id:
-            return Question.objects.filter(author_id=author_id)
-        return Question.objects.all()
+        for key in filter_params.keys():
+            if key not in ['valid_filter1', 'valid_filter2']:  # Список допустимых фильтров
+                raise ValidationError(f"Invalid filter: {key}")
+
+        questions = self.queryset.all()
+        serializer = self.serializer_class(questions, many=True)
+        return Response(serializer.data)
+
+    # def list(self, request):
+    #     questions = self.queryset.all()
+    #     serializer = self.serializer_class(questions, many=True)
+    #     return Response(serializer.data)
+
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data) 
+        if serializer.is_valid():
+            question = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve(self, request, pk=None):
+        try:
+            questions = Question.objects.get(pk=pk)
+            serializer = self.serializer_class(questions)
+            return Response(serializer.data)
+        except Question.DoesNotExist:
+            raise NotFound(detail="Question not found")
+
+    def update(self, request, pk=None):
+        try:
+            question = Question.objects.get(pk=pk)
+            serializer = self.serializer_class(question, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Question.DoesNotExist:
+            raise NotFound(detail="Question not found")
+
+    def partial_update(self, request, pk=None):
+        try:
+            question = Question.objects.get(pk=pk)
+            serializer = self.serializer_class(question, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Question.DoesNotExist:
+            raise NotFound(detail="Question not found")
+
+    def delete(self, request, pk=None):
+        try:
+            question = Question.objects.get(pk=pk)
+            question.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Question.DoesNotExist:
+            raise NotFound(detail="Question not found")
     
 
-class AnswerView(generics.ListAPIView):
+class AnswerView(viewsets.ViewSet):
     serializer_class = AnswerSerializer
     queryset = Answer.objects.all()
 
     def list(self, request):
-        answers = self.queryset
+        filter_params = request.query_params
+
+        for key in filter_params.keys():
+            if key not in ['valid_filter1', 'valid_filter2']:  # Список допустимых фильтров
+                raise ValidationError(f"Invalid filter: {key}")
+
+        answers = self.queryset.all()
         serializer = self.serializer_class(answers, many=True)
         return Response(serializer.data)
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             answer = serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
         try:
@@ -44,7 +101,7 @@ class AnswerView(generics.ListAPIView):
             serializer = self.serializer_class(answer)
             return Response(serializer.data)
         except Answer.DoesNotExist:
-            return Response(serializer.errors)
+            raise NotFound(detail="Answer not found")
 
     def update(self, request, pk=None):
         try:
@@ -52,10 +109,10 @@ class AnswerView(generics.ListAPIView):
             serializer = self.serializer_class(answer, data=request.data)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Answer.DoesNotExist:
-            return Response(serializer.errors)
+            raise NotFound(detail="Answer not found")
 
     def partial_update(self, request, pk=None):
         try:
@@ -63,10 +120,10 @@ class AnswerView(generics.ListAPIView):
             serializer = self.serializer_class(answer, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Answer.DoesNotExist:
-            return Response(serializer.errors)
+            raise NotFound(detail="Answer not found")
 
     def delete(self, request, pk=None):
         try:
@@ -74,4 +131,4 @@ class AnswerView(generics.ListAPIView):
             answer.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Answer.DoesNotExist:
-            return Response("Error")
+            raise NotFound(detail="Answer not found")
