@@ -7,6 +7,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 from pathlib import Path
+from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
@@ -31,6 +32,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'users.apps.UsersConfig',
     'support.apps.SupportConfig',
+    # 'rest_framework_simplejwt',
+    'rest_framework.authtoken',
     'content.apps.ContentConfig'
 ]
 MIDDLEWARE = [
@@ -106,3 +109,16 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "users.backends.EmailBackend",
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),  # Жизнь токена доступа
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Жизнь рефреш-токена
+    'ROTATE_REFRESH_TOKENS': False,  # Указывает, нужно ли обновлять рефреш-токен
+    'BLACKLIST_AFTER_ROTATION': True,
+}
