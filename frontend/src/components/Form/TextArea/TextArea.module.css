@@ -1,0 +1,7 @@
+.input::placeholder {
+  text-align: left;
+}
+
+.input {
+  max-width: 100%;
+}

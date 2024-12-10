@@ -1,0 +1,32 @@
+.TrackAddContent {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.text-area-track-add {
+  padding: 5px;
+  border: 2px solid black;
+
+  border-radius: 0.3rem;
+  min-height: 200px;
+}
+@media (max-width: 900px) {
+  .text-area-track-add {
+    width: 290px;
+  }
+}
+
+@media (min-width: 900px) {
+  .text-area-track-add {
+    width: 390px;
+  }
+}
+
+.text-area-track-label {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+.conteiner-text-area-track {
+  margin-top: 10px;
+}

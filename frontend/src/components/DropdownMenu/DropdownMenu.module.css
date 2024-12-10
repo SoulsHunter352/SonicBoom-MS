@@ -1,22 +1,39 @@
 .menu {
   position: absolute;
-  top: calc(100% + 5px);
+  top: calc(100% + 1rem);
   right: 0;
   width: 140px;
-  padding: 1rem;
-  background-color: #f1e9f3;
+  padding: 0.2rem 1rem 0.2rem 1rem;
+  background-color: var(--sb-dropdown-bg-color);
   border: 1px solid rgb(60, 60, 60);
   border-radius: 1rem;
   opacity: 0;
   transform: translateY(-1rem);
   visibility: hidden;
-  transition: 0.3s;
+  transition: transform 0.2s ease;
   box-shadow: 0 2px 2px 1px rgba(0, 0, 0, 0.3);
-  padding-top: 0.3rem;
+  overflow: hidden;
+  z-index: 200;
 }
 
 .menu.active {
   transform: translateY(0);
   opacity: 1;
   visibility: visible;
+}
+
+.menu.up {
+  transform: translateY(0);
+  top: -0.5rem;
+}
+
+.menu.up.active {
+  transform: translateY(-1rem);
+}
+
+.menu-item {
+  width: 100%;
+}
+
+.menu-list {
 }

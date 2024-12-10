@@ -1,0 +1,42 @@
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3%;
+  margin-left: 5%;
+  margin-right: 5%;
+  height: 40px;
+  align-items: center;
+  text-align: center;
+}
+
+.tab-button {
+  padding: 10px 20px;
+  margin: 0 5px;
+  border: none;
+
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+  flex: 1; /* Устанавливаем одинаковую ширину для кнопок */
+  text-align: center; /* Центрируем текст в кнопках */
+  position: relative; /* Обеспечиваем позиционирование для эффекта подчеркивания */
+}
+
+.plus-button {
+  display: flex;
+  border: none;
+  border-radius: 9999rem;
+  flex: 1;
+  height: 20px;
+  min-width: 20px;
+  background-color: transparent;
+  margin-left: 0.5rem;
+}
+
+.tab-button.active {
+  border-bottom: 3px solid yellow;
+}
+
+.relative-container {
+  position: relative;
+}

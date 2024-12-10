@@ -1,0 +1,13 @@
+.track-image {
+  max-width: 200px;
+  width: 50%; /* или фиксированное значение, например, 200px */
+  aspect-ratio: 1 / 1; /* Соотношение сторон 1:1 для квадрата */
+  border-radius: 10px;
+  object-fit: cover;
+  display: flex;
+}
+
+.track-title {
+  margin: 10px 0;
+  font-size: 24px;
+}

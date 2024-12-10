@@ -1,85 +1,94 @@
 import classes from "./Header.module.css";
-import MainButton from "../MainButton/MainButton";
+import MainButton from "./MainButton/MainButton";
 import DropdownMenu from "../DropdownMenu/DropdownMenu";
 import logoImg from "../../assets/images/600px-SBMS.webp";
 import noAvatarImg from "../../assets/images/noAvatar.webp";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
-export default function Header({ user, type }) {
+export default function Header({ user }) {
   const [isOpenNav, setIsOpenNav] = useState(false);
   const [isOpenProfile, setIsOpenProfile] = useState(false);
-
-  function toggleIsOpenNav() {
-    setIsOpenNav((prev) => !prev);
-  }
-
-  function toggleIsOpenProfile() {
-    setIsOpenProfile((prev) => !prev);
-  }
+  const [isOpenSearch, setIsOpenSearch] = useState(false);
 
   function navButtons() {
-    return type === "non-auth" ? (
+    return user.type === "non-auth" ? (
       <>
-        <MainButton>Регистрация</MainButton>
-        <MainButton>Вход</MainButton>
+        <MainButton to="/registration">Регистрация</MainButton>
+        <MainButton to="/login">Вход</MainButton>
       </>
     ) : (
       <>
         <MainButton>Мои плейлисты</MainButton>
-        {type === "admin" && <MainButton>Управление</MainButton>}
-        <MainButton>Вопросы</MainButton>
+        {user.type === "admin" && (
+          <MainButton to="/control/users">Управление</MainButton>
+        )}
+        <MainButton to="/feedback">Вопросы</MainButton>
       </>
     );
   }
 
   return (
     <header className={classes.header}>
-      <div className={classes["brand-container"]}>
-        <img src={logoImg} alt="LOGO" />
-        <p>Sonic BOOM</p>
-      </div>
+      <Link to="/">
+        <div className={classes["brand-container"]}>
+          <img src={logoImg} alt="logo" />
+          <p>Sonic BOOM</p>
+        </div>
+      </Link>
 
       <div className={classes["search-container"]}>
-        <MainButton title="Поиск">
-          <i class="fa-solid fa-magnifying-glass"></i>
+        <MainButton
+          title="Поиск"
+          onClick={() => setIsOpenSearch((prev) => !prev)}
+        >
+          <i className="fa-solid fa-magnifying-glass"></i>
         </MainButton>
+
+        <DropdownMenu isOpen={isOpenSearch} setIsOpen={setIsOpenSearch}>
+          <input type="text" name="search" placeholder="Поиск..." />
+        </DropdownMenu>
       </div>
 
       <div className={classes["nav-buttons-container"]}>{navButtons()}</div>
 
       <div className={classes["bars-container"]}>
-        <MainButton title="Развернуть список" onClick={toggleIsOpenNav}>
-          <i class="fa-solid fa-bars"></i>
+        <MainButton
+          title="Развернуть список"
+          onClick={() => setIsOpenNav((prev) => !prev)}
+        >
+          <i className="fa-solid fa-bars"></i>
         </MainButton>
 
         <DropdownMenu
-          setIsOpen={setIsOpenNav}
           isOpen={isOpenNav}
+          setIsOpen={setIsOpenNav}
           className={classes["header-dropdown-menu"]}
         >
           {navButtons().props.children}
         </DropdownMenu>
       </div>
 
-      {type !== "non-auth" && (
+      {user.type !== "non-auth" && (
         <div className={classes["avatar-container"]}>
           <img
             src={user?.avatar ? user.avatar : noAvatarImg}
-            alt="USER"
-            onClick={toggleIsOpenProfile}
+            alt="avatar"
+            onClick={() => setIsOpenProfile((prev) => !prev)}
             title="Профиль пользователя"
           />
 
           <DropdownMenu
-            setIsOpen={setIsOpenProfile}
             isOpen={isOpenProfile}
+            setIsOpen={setIsOpenProfile}
             className={classes["header-dropdown-menu"]}
           >
-            <p>{user?.nickname ? user.nickname : "Никнейм"}</p>
-            <MainButton>Профиль</MainButton>
+            <p>{user?.nickname ? user.nickname : ""}</p>
+            <MainButton to="/profile">Профиль</MainButton>
             <MainButton>Поддержка</MainButton>
-            <MainButton>
-              <span style={{ color: "red" }}>Выход</span>
+            <MainButton>О сайте</MainButton>
+            <MainButton title="Выйти">
+              <span style={{ color: "red" }}>Выйти</span>
             </MainButton>
           </DropdownMenu>
         </div>

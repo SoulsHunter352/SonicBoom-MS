@@ -1,0 +1,19 @@
+.genre_selector {
+  padding: 5px;
+  border: 2px solid black;
+  margin-top: 20px;
+  border-radius: 0.3rem;
+}
+@media (max-width: 900px) {
+  .genre_selector {
+    width: 300px;
+  }
+}
+
+@media (min-width: 900px) {
+  .genre_selector {
+    width: 400px;
+  }
+}
+.text-area-track-label {
+}
