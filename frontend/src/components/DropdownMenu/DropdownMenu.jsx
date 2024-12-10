@@ -3,10 +3,11 @@ import { useRef } from "react";
 import { useClickOutside } from "../../hooks/useClickOutside";
 
 export default function DropdownMenu({
-  setIsOpen,
   isOpen,
+  setIsOpen,
   children,
   className,
+  up = false,
 }) {
   const dropdownRef = useRef();
 
@@ -14,25 +15,27 @@ export default function DropdownMenu({
     if (isOpen) setIsOpen(false);
   });
 
-  function getItem(item, id) {
+  const getItem = (item, id) => {
     if (item)
       return (
         <li key={id} className={classes["menu-item"]}>
           {item}
-          {id !== children.length - 1 && <hr />}
+          {children.length > 1 && id !== children.length - 1 && <hr />}
         </li>
       );
     return null;
-  }
+  };
 
   return (
     <nav
-      className={`${classes.menu} ${isOpen ? classes.active : ""} ${
-        className ? className : ""
-      }`}
+      className={`${className ? className : ""} ${classes.menu} ${
+        isOpen ? classes.active : ""
+      } ${up ? classes.up : ""}`}
       ref={dropdownRef}
     >
-      <ul className={classes["menu-list"]}>{children.map(getItem)}</ul>
+      <ul className={classes["menu-list"]}>
+        {children.map ? children.map(getItem) : getItem(children)}
+      </ul>
     </nav>
   );
 }

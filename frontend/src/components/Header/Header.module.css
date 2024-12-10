@@ -1,13 +1,11 @@
 .header {
-  background-color: #8d44b0;
+  background-color: var(--sb-main-color);
   height: 3.5rem;
+  min-height: 3.5rem;
   display: flex;
   align-items: center;
   z-index: 100;
-  position: fixed;
   width: 100%;
-  top: 0;
-  left: 0;
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
   box-shadow: 0 0 3px 4px rgba(0, 0, 0, 0.4);
@@ -20,6 +18,12 @@
 .bars-container i,
 .search-container i {
   color: white;
+}
+
+.brand-container a {
+  text-decoration: none;
+  margin: 0px;
+  padding: 0px;
 }
 
 .brand-container {
@@ -41,18 +45,31 @@
 
 .search-container {
   margin: auto;
+
+  nav {
+    right: calc(-100vw * 0.22) !important;
+    width: calc(100vw * 0.5) !important;
+    padding: 0 !important;
+    border-radius: 0.5rem !important;
+
+    input {
+      width: 100%;
+      border: 1px solid var(--sb-input-border-color);
+      border-radius: 0.5rem;
+      height: 2rem;
+    }
+  }
 }
 
 .nav-buttons-container button,
 .bars-container {
-  margin-right: 0.7rem;
+  margin-right: 0.5rem;
 }
 
 .avatar-container {
   margin-right: 1rem;
   height: 2rem;
   min-width: 2rem;
-  position: relative;
 }
 
 .avatar-container img {
@@ -64,6 +81,11 @@
 
 .bars-container {
   display: none;
+}
+
+.search-container,
+.avatar-container,
+.bars-container {
   position: relative;
 }
 

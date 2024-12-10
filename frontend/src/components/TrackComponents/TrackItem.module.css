@@ -1,0 +1,54 @@
+.trackItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid var(--sb-input-border-color);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
+}
+
+.trackItem:hover {
+  background-color: #f7f7f7;
+}
+
+.trackInfo {
+  display: flex;
+  align-items: center;
+}
+
+.trackIcon {
+  width: 50px;
+  height: 50px;
+  border-radius: 4px;
+  margin-right: 15px;
+}
+
+.trackTitle {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.trackActions {
+  display: flex;
+  align-items: center;
+}
+
+.playButton,
+.menuButton {
+  background: none;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  margin-left: 10px;
+  margin-right: 15px;
+  font-size: 20px;
+  transition: color 0.3s;
+}
+
+.playButton:hover,
+.menuButton:hover {
+  color: #000;
+}

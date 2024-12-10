@@ -1,0 +1,31 @@
+.container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.info_search {
+  padding: 10px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: auto;
+  padding: 10px;
+  box-sizing: border-box;
+  padding-left: 35px; /* Добавить отступ слева, чтобы не перекрывать иконку */
+  padding-right: 10px;
+}
+
+.input_container {
+  position: relative;
+  width: 80%;
+}
+
+.input_container i {
+  position: absolute;
+  left: 10px; /* Расстояние от левой границы */
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa; /* Цвет иконки */
+  pointer-events: none; /* Иконка не будет перехватывать клики */
+}

@@ -1,0 +1,22 @@
+.main-div-mp3 {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}
+.mp3-label-text {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+.mp3-button-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 200px;
+  max-height: 50px;
+  font-weight: bolder;
+
+  i {
+    margin: auto;
+  }
+}

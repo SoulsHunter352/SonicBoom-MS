@@ -1,8 +1,28 @@
+:root {
+  --sb-main-color: #8d44b0;
+  --sb-main-color-hover: #683381;
+
+  --sb-player-artist-color: #6e6e6e;
+  --sb-track-color: #bca7c5;
+  --sb-player-bg-color: #e9c9f8;
+  --sb-player-line-color: #bca7c5;
+  --sb-player-line-time-color: #202020;
+  --sb-player-active-btn: #34203d;
+
+  --sb-dropdown-bg-color: #fdfdfb;
+  --sb-input-border-color: #ccc;
+  --sb-main-btn-text-color: #353535;
+}
+
 * {
   margin: 0;
   padding: 0;
-  transition: all 0.1s ease;
   font-family: "Open Sans", sans-serif;
+}
+
+button,
+i {
+  transition: all 0.1s ease;
 }
 
 p,
@@ -23,7 +43,10 @@ img {
 }
 
 html,
-body {
+body,
+#root,
+.wrapper,
+.page {
   height: 100%;
   width: 100%;
 }
@@ -35,10 +58,34 @@ ul {
 *::-webkit-scrollbar {
   width: 0.5rem;
   height: 0.5rem;
-  background: var(--bs-body-bg);
+  background: rgb(233, 233, 233);
 }
 
 *::-webkit-scrollbar-thumb {
-  background: var(--bs-gray-700);
+  background: rgb(180, 180, 180);
   border-radius: 1rem;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.page {
+  overflow: auto;
+  display: grid;
+}
+
+input[type="range"]:focus {
+  outline: none;
+}
+
+a[data-discover] {
+  text-decoration: none;
+  color: unset;
+}
+
+button {
+  cursor: pointer;
 }
