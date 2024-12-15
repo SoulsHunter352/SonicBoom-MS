@@ -38,7 +38,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['login', 'email', 'username', 'password1', 'password2']
+        fields = ['login', 'email', 'username', 'password1', 'password2', 'role']
 
     def validate(self, data):
         """
@@ -64,7 +64,8 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             login=validated_data['login'],  # Уникальный логин
             username=validated_data['username'],  # Никнейм пользователя
             email=validated_data['email'],  # Email пользователя
-            password=password  # Устанавливаем пароль
+            password=password,  # Устанавливаем пароль
+            role=validated_data['role']
         )
 
         return user
