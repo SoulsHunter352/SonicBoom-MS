@@ -14,13 +14,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-3c2ft8hzpsqhndlf1vvnv+i-h%fee%-6d+9_t2o8!s!s7cfu2d'
+SECRET_KEY = 'YOUR_SECRET_KEY'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ["sonic-boom.ru"]
 # Application definition
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3001",
+    "https://sonic-boom.ru"
 ]
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users.apps.UsersConfig',
     'support.apps.SupportConfig',
-    # 'rest_framework_simplejwt',
+    'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'content.apps.ContentConfig'
 ]
@@ -97,11 +97,11 @@ USE_I18N = True
 USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-STATIC_URL = 'static/'
+STATIC_URL = 'files/static/'
 
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / 'files' / 'media'
 
-MEDIA_URL = '/media/'
+MEDIA_URL = 'files/media/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -118,8 +118,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),  # Жизнь токена доступа
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Жизнь рефреш-токена
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # Жизнь токена доступа
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    # Жизнь рефреш-токена
     'ROTATE_REFRESH_TOKENS': False,  # Указывает, нужно ли обновлять рефреш-токен
     'BLACKLIST_AFTER_ROTATION': True,
 }
