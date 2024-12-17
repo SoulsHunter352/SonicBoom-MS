@@ -144,6 +144,15 @@ def login(request):
             max_age=7 * 24 * 60 * 60  # 7 дней
         )
 
+        response.set_cookie(
+            key="access_token",
+            value=str(access_token),
+            httponly=True,  # Нельзя прочитать через JavaScript
+            secure=True,  # Только по HTTPS
+            samesite='Strict',  # Защита от CSRF
+            max_age=1 * 24 * 60 * 60  # 7 дней
+        )
+
         return response
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -180,6 +189,8 @@ def logout_view(request):
     Выход из аккаунта.
     """
     logout(request)
+    response = Response({"message": "Вы успешно вышли из аккаунта."}, status=status.HTTP_200_OK)
+    response.delete_cookie('refresh_token')
     return Response({"message": "Вы успешно вышли из аккаунта."}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
@@ -196,10 +207,21 @@ def refresh_access_token(request):
         # Генерация нового access токена
         new_access_token = refresh.access_token
 
-        # Возвращаем новый access токен в ответе
-        return Response({
+        response = Response({
             'access_token': str(new_access_token),
         })
+
+        response.set_cookie(
+            key="access_token",
+            value=str(new_access_token),
+            httponly=True,  # Нельзя прочитать через JavaScript
+            secure=True,  # Только по HTTPS
+            samesite='Strict',  # Защита от CSRF
+            max_age=1 * 24 * 60 * 60  # 7 дней
+        )
+
+        # Возвращаем новый access токен в ответе
+        return response
 
     except Exception as e:
         return Response({"error": str(e)}, status=400)
