@@ -67,6 +67,15 @@ class UserViewSet(viewsets.ViewSet):
         # Возвращаем сообщение об успешном удалении
         return Response({"message": "Пользователь успешно удален"}, status=status.HTTP_204_NO_CONTENT)
 
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def profile(self, request):
+        """
+        Возвращает профиль текущего авторизованного пользователя.
+        """
+        user = request.user  # Получаем текущего пользователя из запроса
+        serializer = self.serializer_class(user)  # Сериализуем данные пользователя
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def partial_update(self, request, pk=None):
         """
         Частичное обновление данных пользователя.
