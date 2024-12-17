@@ -113,11 +113,16 @@ AUTHENTICATION_BACKENDS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'users.authentication.CustomAuthentication'
     ],
 }
 
 SIMPLE_JWT = {
+    'AUTH_COOKIE': 'access_token',  # Cookie name. Enables cookies if value is set.
+    'AUTH_COOKIE_SECURE': True,    # Whether the auth cookies should be secure (https:// only).
+    'AUTH_COOKIE_HTTP_ONLY': True,  # Http only cookie flag.It's not fetch by javascript.
+    'AUTH_COOKIE_PATH': '/',
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # Жизнь токена доступа
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    # Жизнь рефреш-токена
     'ROTATE_REFRESH_TOKENS': False,  # Указывает, нужно ли обновлять рефреш-токен
