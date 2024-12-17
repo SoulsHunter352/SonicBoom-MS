@@ -277,7 +277,7 @@ class ArtistViewSet(CustomPermissionMixin, viewsets.ViewSet):
             return Response("NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
 
 
-class PlaylistViewSet(CustomPermissionMixin,viewsets.ViewSet):
+class PlaylistViewSet(CustomPermissionMixin, viewsets.ViewSet):
     serializer_class = PlaylistSerializer
     queryset = Playlist.objects.all()
 
