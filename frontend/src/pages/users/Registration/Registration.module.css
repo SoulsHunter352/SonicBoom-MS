@@ -1,0 +1,25 @@
+@media all and (max-width: 900px) {
+  .icon_wrapper {
+    display: none;
+  }
+}
+
+@media all and (min-width: 900px) {
+  .icon_wrapper {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+.form_wrapper {
+  display: flex;
+  margin: auto;
+}
+
+.icon_wrapper {
+  width: 300px;
+  margin-top: 40px;
+  margin-left: 40px;
+}

@@ -13,6 +13,7 @@ from django.http import JsonResponse
 
 
 
+
 # Create your views here.
 class UserViewSet(viewsets.ViewSet):
     serializer_class = UserSerializer
