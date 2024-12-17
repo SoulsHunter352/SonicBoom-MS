@@ -1,12 +1,15 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
-from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.decorators import  permission_classes, action
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.response import Response
-from django.contrib.auth import login, logout
+from django.contrib.auth import  logout
 from .models import User
 from .serializers import UserSerializer, LoginSerializer, RegisterUserSerializer, ChangePasswordSerializer
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
 
 
 
@@ -64,6 +67,15 @@ class UserViewSet(viewsets.ViewSet):
         # Возвращаем сообщение об успешном удалении
         return Response({"message": "Пользователь успешно удален"}, status=status.HTTP_204_NO_CONTENT)
 
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def profile(self, request):
+        """
+        Возвращает профиль текущего авторизованного пользователя.
+        """
+        user = request.user  # Получаем текущего пользователя из запроса
+        serializer = self.serializer_class(user)  # Сериализуем данные пользователя
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def partial_update(self, request, pk=None):
         """
         Частичное обновление данных пользователя.
@@ -89,6 +101,7 @@ class UserViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
+
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def change_password(self, request):
         """
@@ -104,19 +117,61 @@ class UserViewSet(viewsets.ViewSet):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def login_view(request):
+def login(request):
     """
-    Авторизация пользователя с использованием LoginSerializer.
+    Авторизация пользователя с использованием LoginSerializer и сохранением refresh-токена в куки.
     """
     serializer = LoginSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.get_user()
 
-        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-        return Response({"message": "Вы успешно вошли в систему!"}, status=status.HTTP_200_OK)
+        # Генерация токенов
+        refresh = RefreshToken.for_user(user)
+        access_token = refresh.access_token
+
+        # Установка refresh-токена в HttpOnly cookie
+        response = Response({
+            "message": "Вы успешно вошли в систему!",
+            "access_token": str(access_token),
+        }, status=status.HTTP_200_OK)
+
+        response.set_cookie(
+            key="refresh_token",
+            value=str(refresh),
+            httponly=True,  # Нельзя прочитать через JavaScript
+            secure=True,  # Только по HTTPS
+            samesite='Strict',  # Защита от CSRF
+            max_age=7 * 24 * 60 * 60  # 7 дней
+        )
+
+        return response
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_auth(request):
+    """
+    Проверка авторизации пользователя через refresh-токен из куки.
+    """
+    refresh_token = request.COOKIES.get('refresh_token')
+
+    if not refresh_token:
+        return Response({"authenticated": False, "message": "Токен отсутствует"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        # Проверяем refresh-токен
+        refresh = RefreshToken(refresh_token)
+        user = refresh.access_token.payload['user_id']  # Или используйте библиотеку для извлечения юзера
+
+        return Response({
+            "authenticated": True,
+            "message": "Пользователь авторизован",
+        }, status=status.HTTP_200_OK)
+
+    except TokenError:
+        return Response({"authenticated": False, "message": "Токен недействителен"}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -126,3 +181,25 @@ def logout_view(request):
     """
     logout(request)
     return Response({"message": "Вы успешно вышли из аккаунта."}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def refresh_access_token(request):
+    # Извлекаем refresh токен из cookie
+    refresh_token = request.COOKIES.get('refresh_token')
+
+    if not refresh_token:
+        return Response({"error": "Refresh token missing"}, status=400)
+
+    try:
+        # Проверка refresh токена
+        refresh = RefreshToken(refresh_token)
+        # Генерация нового access токена
+        new_access_token = refresh.access_token
+
+        # Возвращаем новый access токен в ответе
+        return Response({
+            'access_token': str(new_access_token),
+        })
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
