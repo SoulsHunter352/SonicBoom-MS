@@ -30,9 +30,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
-    login = serializers.CharField(max_length=150)  # Уникальный логин пользователя
-    email = serializers.EmailField()  # Email пользователя
-    username = serializers.CharField(max_length=150)  # Имя пользователя внутри системы
     password1 = serializers.CharField(write_only=True)  # Пароль пользователя
     password2 = serializers.CharField(write_only=True)  # Повторение пароля пользователя
 
@@ -65,7 +62,6 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             username=validated_data['username'],  # Никнейм пользователя
             email=validated_data['email'],  # Email пользователя
             password=password,  # Устанавливаем пароль
-            role=validated_data['role']
         )
 
         return user
