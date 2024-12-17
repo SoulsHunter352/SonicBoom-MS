@@ -1,15 +1,15 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
-from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.decorators import  permission_classes, action
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.contrib.auth import login, logout
+from django.contrib.auth import  logout
 from .models import User
 from .serializers import UserSerializer, LoginSerializer, RegisterUserSerializer, ChangePasswordSerializer
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.http import JsonResponse
+
 
 
 
@@ -91,14 +91,7 @@ class UserViewSet(viewsets.ViewSet):
         serializer = self.serializer_class(instance)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
-    def profile(self, request):
-        """
-        Возвращает профиль текущего авторизованного пользователя.
-        """
-        user = request.user  # Получаем текущего пользователя из запроса
-        serializer = self.serializer_class(user)  # Сериализуем данные пользователя
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def change_password(self, request):
