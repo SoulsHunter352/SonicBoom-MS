@@ -17,11 +17,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'YOUR_SECRET_KEY'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-ALLOWED_HOSTS = ["sonic-boom.ru"]
+ALLOWED_HOSTS = [".sonic-boom.ru"]
 # Application definition
-CORS_ALLOWED_ORIGINS = [
-    "https://sonic-boom.ru"
-]
+# CORS_ALLOWED_ORIGINS = ["http://localhost:3001"]
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -101,6 +101,8 @@ STATIC_URL = 'files/static/'
 
 MEDIA_ROOT = BASE_DIR / 'files' / 'media'
 
+STATIC_ROOT = BASE_DIR / 'files' / 'static'
+
 MEDIA_URL = 'files/media/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -118,8 +120,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # Жизнь токена доступа
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    # Жизнь рефреш-токена
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=7),  # Жизнь токена доступа
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=14),    # Жизнь рефреш-токена
     'ROTATE_REFRESH_TOKENS': False,  # Указывает, нужно ли обновлять рефреш-токен
     'BLACKLIST_AFTER_ROTATION': True,
 }
