@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.contrib.auth import login, logout
@@ -45,19 +46,22 @@ class UserViewSet(viewsets.ViewSet):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def update(self, request, pk=None):
+    def delete(self, request, pk=None):
         """
-        Полное обновление данных пользователя.
+        Удаляет пользователя.
         """
-        instance = get_object_or_404(self.get_queryset(), pk=pk)
-        if not instance:
-            return Response({"error": "Пользователь не найден"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            # Получаем пользователя по первичному ключу (pk)
+            instance = self.get_queryset().get(pk=pk)
+        except User.DoesNotExist:
+            # Возвращаем ошибку в формате JSON, если пользователь не найден
+            raise NotFound(detail="Пользователь не найден")
 
-        serializer = self.serializer_class(instance, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Удаляем пользователя
+        instance.delete()
+
+        # Возвращаем сообщение об успешном удалении
+        return Response({"message": "Пользователь успешно удален"}, status=status.HTTP_204_NO_CONTENT)
 
     def partial_update(self, request, pk=None):
         """
@@ -87,11 +91,13 @@ class UserViewSet(viewsets.ViewSet):
         """
         Удаляет пользователя.
         """
+        # Получаем пользователя по первичному ключу (pk). Если не найден, выбрасывается исключение Http404.
         instance = get_object_or_404(self.get_queryset(), pk=pk)
-        if not instance:
-            return Response({"error": "Пользователь не найден"}, status=status.HTTP_404_NOT_FOUND)
 
+        # Удаляем пользователя
         instance.delete()
+
+        # Возвращаем сообщение об успешном удалении
         return Response({"message": "Пользователь успешно удален"}, status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
