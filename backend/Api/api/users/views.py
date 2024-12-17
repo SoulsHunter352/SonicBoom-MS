@@ -87,18 +87,6 @@ class UserViewSet(viewsets.ViewSet):
         serializer = self.serializer_class(instance)
         return Response(serializer.data)
 
-    def delete(self, request, pk=None):
-        """
-        Удаляет пользователя.
-        """
-        # Получаем пользователя по первичному ключу (pk). Если не найден, выбрасывается исключение Http404.
-        instance = get_object_or_404(self.get_queryset(), pk=pk)
-
-        # Удаляем пользователя
-        instance.delete()
-
-        # Возвращаем сообщение об успешном удалении
-        return Response({"message": "Пользователь успешно удален"}, status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def change_password(self, request):
