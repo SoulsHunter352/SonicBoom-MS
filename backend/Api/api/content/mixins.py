@@ -14,6 +14,10 @@ class CustomPermissionMixin:
         else:
             return [IsAuthenticated(), IsModerator()]
 
+class CustomPermissionMixinPlaylist:
+    def get_permissions(self):
+        return [IsAuthenticated()]
+
 
 class ViewSetTestsMixin:
     """
