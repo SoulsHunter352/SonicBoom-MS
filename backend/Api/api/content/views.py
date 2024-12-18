@@ -4,7 +4,7 @@ from rest_framework.decorators import permission_classes, action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
-from .mixins import CustomPermissionMixin
+from .mixins import CustomPermissionMixin,CustomPermissionMixinPlaylist
 from .models import *
 from .serializers import *
 # from users.permissions import IsModerator
@@ -277,25 +277,25 @@ class ArtistViewSet(CustomPermissionMixin, viewsets.ViewSet):
             return Response("NOT_FOUND", status=status.HTTP_404_NOT_FOUND)
 
 
-class PlaylistViewSet(CustomPermissionMixin, viewsets.ViewSet):
+class PlaylistViewSet(CustomPermissionMixinPlaylist,viewsets.ViewSet):
     serializer_class = PlaylistSerializer
     queryset = Playlist.objects.all()
 
     def list(self, request):
-        playlists = self.queryset.all()
+        playlists = Playlist.objects.filter(user=request.user)
         serializer = self.serializer_class(playlists, many=True)
         return Response(serializer.data)
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            playlist = serializer.save()
+            serializer.save(user=request.user)
             return Response(serializer.data)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
         try:
-            playlist = Playlist.objects.get(pk=pk)
+            playlist = Playlist.objects.get(pk=pk, user=request.user)
             serializer = self.serializer_class(playlist)
             return Response(serializer.data)
         except Playlist.DoesNotExist:
@@ -303,7 +303,7 @@ class PlaylistViewSet(CustomPermissionMixin, viewsets.ViewSet):
 
     def update(self, request, pk=None):
         try:
-            playlist = Playlist.objects.get(pk=pk)
+            playlist = Playlist.objects.get(pk=pk, user=request.user)
             serializer = self.serializer_class(playlist, data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -314,7 +314,7 @@ class PlaylistViewSet(CustomPermissionMixin, viewsets.ViewSet):
 
     def partial_update(self, request, pk=None):
         try:
-            playlist = Playlist.objects.get(pk=pk)
+            playlist = Playlist.objects.get(pk=pk, user=request.user)
             serializer = self.serializer_class(playlist, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -325,7 +325,7 @@ class PlaylistViewSet(CustomPermissionMixin, viewsets.ViewSet):
 
     def delete(self, request, pk=None):
         try:
-            playlist = Playlist.objects.get(pk=pk)
+            playlist = Playlist.objects.get(pk=pk, user=request.user)
             playlist.delete()
             return Response()
         except Playlist.DoesNotExist:
@@ -334,7 +334,7 @@ class PlaylistViewSet(CustomPermissionMixin, viewsets.ViewSet):
     @action(detail=True, methods=['get'])
     def tracks(self, request, pk=None):
         try:
-            playlist = Playlist.objects.get(pk=pk)
+            playlist = Playlist.objects.get(pk=pk, user=request.user)
             tracks = playlist.song.all()
             serializer = SongSerializer(tracks, many=True)
             return Response(serializer.data)
