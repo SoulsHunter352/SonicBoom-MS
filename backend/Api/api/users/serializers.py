@@ -30,15 +30,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
-    login = serializers.CharField(max_length=150)  # Уникальный логин пользователя
-    email = serializers.EmailField()  # Email пользователя
-    username = serializers.CharField(max_length=150)  # Имя пользователя внутри системы
     password1 = serializers.CharField(write_only=True)  # Пароль пользователя
     password2 = serializers.CharField(write_only=True)  # Повторение пароля пользователя
 
     class Meta:
         model = User
-        fields = ['login', 'email', 'username', 'password1', 'password2']
+        fields = ['login', 'email', 'username', 'password1', 'password2', 'role']
 
     def validate(self, data):
         """
@@ -64,7 +61,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             login=validated_data['login'],  # Уникальный логин
             username=validated_data['username'],  # Никнейм пользователя
             email=validated_data['email'],  # Email пользователя
-            password=password  # Устанавливаем пароль
+            password=password,  # Устанавливаем пароль
         )
 
         return user

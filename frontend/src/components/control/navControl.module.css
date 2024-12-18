@@ -1,0 +1,66 @@
+.nav_container {
+  box-sizing: border-box;
+  width: 80%;
+  padding: 25px;
+  display: flex;
+  margin: auto;
+  margin-top: 5%;
+  margin-bottom: 0;
+}
+
+.nav_control {
+  display: flex;
+  width: 100%;
+}
+
+.ul_control {
+  width: 100%;
+  display: flex;
+  margin: auto;
+  justify-content: space-around;
+}
+
+.li_control {
+  border-radius: 10px;
+  font-size: calc(0.5em + 0.7vw);
+}
+
+.link {
+  text-decoration: none;
+  color: #555;
+  font-weight: 500;
+  padding: 5px 10px;
+  text-align: center;
+}
+
+.link.active {
+  text-decoration: none;
+  color: #000;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-bottom: 3px solid yellow;
+}
+
+/* Стиль для наведения мыши */
+.link:hover {
+  background-color: #e7e6e7; /* Цвет заливки при наведении */
+  color: black; /* Цвет текста при наведении */
+  border-radius: 15px;
+}
+
+@media screen and (max-width: 500px) {
+  .ul_control {
+    display: grid; /* Включаем Grid */
+    grid-template-columns: repeat(2, 1fr); /* Два столбца */
+    gap: 10px; /* Расстояние между элементами */
+    list-style: none; /* Убираем маркеры у списка */
+    padding: 0; /* Убираем внутренний отступ */
+    margin: 0; /* Убираем внешний отступ */
+    text-align: center;
+  }
+
+  .li_control {
+    border-radius: 10px;
+    font-size: calc(0.7em + 0.7vw);
+  }
+}

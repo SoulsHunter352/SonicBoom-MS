@@ -1,0 +1,42 @@
+.album-grid {
+  max-width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+  margin-bottom: 2%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+@media (min-width: 801px) {
+  .album-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+@media (min-width: 601px, max-width: 800px) {
+  .album-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .album-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.album-card {
+  text-align: center;
+  padding: 2%;
+  background: white;
+}
+
+.album-cover {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+.album-title {
+  font-size: 18px;
+}
