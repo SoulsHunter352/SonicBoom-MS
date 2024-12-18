@@ -15,7 +15,6 @@ class QuestionSerializer(serializers.ModelSerializer):
         return Question.objects.create(**validated_data)
     
     def update(self, instance, validated_data):
-        instance.author = validated_data.get('author', instance.author)
         instance.question_text = validated_data.get('question_text', instance.question_text)
         instance.created_at = validated_data.get('created_at', instance.created_at)
         instance.status = validated_data.get('status', instance.status)
@@ -35,9 +34,7 @@ class AnswerSerializer(serializers.ModelSerializer):
         return Answer.objects.create(**validated_data)
     
     def update(self, instance, validated_data):
-        instance.responder = validated_data.get('responder', instance.responder)
         instance.answer_text = validated_data.get('answer_text', instance.answer_text)
         instance.question = validated_data.get('question', instance.question)
-        #instance.created_at = validated_data.get('created_at', instance.created_at)
         instance.save()
         return instance

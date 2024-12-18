@@ -3,7 +3,7 @@ from rest_framework import generics, status, viewsets
 from rest_framework.response import Response
 from .models import Question, Answer
 from .serializers import QuestionSerializer, AnswerSerializer
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.exceptions import ValidationError
 
 
@@ -15,17 +15,12 @@ class QuestionView(viewsets.ViewSet):
         filter_params = request.query_params
 
         for key in filter_params.keys():
-            if key not in ['valid_filter1', 'valid_filter2']:  # Список допустимых фильтров
+            if key not in ['valid_filter1', 'valid_filter2']:
                 raise ValidationError(f"Invalid filter: {key}")
 
         questions = self.queryset.all()
         serializer = self.serializer_class(questions, many=True)
         return Response(serializer.data)
-
-    # def list(self, request):
-    #     questions = self.queryset.all()
-    #     serializer = self.serializer_class(questions, many=True)
-    #     return Response(serializer.data)
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data) 
@@ -45,6 +40,10 @@ class QuestionView(viewsets.ViewSet):
     def update(self, request, pk=None):
         try:
             question = Question.objects.get(pk=pk)
+
+            if question.author != request.user and not (request.user.is_admin() or request.user.is_moderator()):
+                raise PermissionDenied("You do not have permission to edit this question.")
+            
             serializer = self.serializer_class(question, data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -56,6 +55,10 @@ class QuestionView(viewsets.ViewSet):
     def partial_update(self, request, pk=None):
         try:
             question = Question.objects.get(pk=pk)
+
+            if question.author != request.user and not (request.user.is_admin() or request.user.is_moderator()):
+                raise PermissionDenied("You do not have permission to edit this question.")
+            
             serializer = self.serializer_class(question, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -67,6 +70,10 @@ class QuestionView(viewsets.ViewSet):
     def delete(self, request, pk=None):
         try:
             question = Question.objects.get(pk=pk)
+
+            if question.author != request.user and not (request.user.is_admin() or request.user.is_moderator()):
+                raise PermissionDenied("You do not have permission to edit this question.")
+            
             question.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Question.DoesNotExist:
@@ -81,7 +88,7 @@ class AnswerView(viewsets.ViewSet):
         filter_params = request.query_params
 
         for key in filter_params.keys():
-            if key not in ['valid_filter1', 'valid_filter2']:  # Список допустимых фильтров
+            if key not in ['valid_filter1', 'valid_filter2']:
                 raise ValidationError(f"Invalid filter: {key}")
 
         answers = self.queryset.all()
@@ -106,6 +113,10 @@ class AnswerView(viewsets.ViewSet):
     def update(self, request, pk=None):
         try:
             answer = Answer.objects.get(pk=pk)
+
+            if answer.responder != request.user and not (request.user.is_admin() or request.user.is_moderator()):
+                raise PermissionDenied("You do not have permission to edit this answer.")
+            
             serializer = self.serializer_class(answer, data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -117,6 +128,10 @@ class AnswerView(viewsets.ViewSet):
     def partial_update(self, request, pk=None):
         try:
             answer = Answer.objects.get(pk=pk)
+
+            if answer.responder != request.user and not (request.user.is_admin() or request.user.is_moderator()):
+                raise PermissionDenied("You do not have permission to edit this answer.")
+            
             serializer = self.serializer_class(answer, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -128,6 +143,10 @@ class AnswerView(viewsets.ViewSet):
     def delete(self, request, pk=None):
         try:
             answer = Answer.objects.get(pk=pk)
+
+            if answer.responder != request.user and not (request.user.is_admin() or request.user.is_moderator()):
+                raise PermissionDenied("You do not have permission to edit this answer.")
+            
             answer.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Answer.DoesNotExist:
