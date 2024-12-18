@@ -140,8 +140,8 @@ def login(request):
             value=str(refresh),
             httponly=True,  # Нельзя прочитать через JavaScript
             secure=True,  # Только по HTTPS
-            samesite='Strict',  # Защита от CSRF
-            max_age=7 * 24 * 60 * 60  # 7 дней
+            samesite='None',  # Защита от CSRF
+            max_age=14 * 24 * 60 * 60  # 14 дней
         )
 
         response.set_cookie(
@@ -149,8 +149,8 @@ def login(request):
             value=str(access_token),
             httponly=True,  # Нельзя прочитать через JavaScript
             secure=True,  # Только по HTTPS
-            samesite='Strict',  # Защита от CSRF
-            max_age=1 * 24 * 60 * 60  # 7 дней
+            samesite='None',  # Защита от CSRF
+            max_age=7 * 24 * 60 * 60  # 7 дней
         )
 
         return response
@@ -216,7 +216,7 @@ def refresh_access_token(request):
             value=str(new_access_token),
             httponly=True,  # Нельзя прочитать через JavaScript
             secure=True,  # Только по HTTPS
-            samesite='Strict',  # Защита от CSRF
+            samesite='None',  # Защита от CSRF
             max_age=1 * 24 * 60 * 60  # 7 дней
         )
 
