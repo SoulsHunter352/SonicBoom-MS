@@ -7,7 +7,7 @@ from users.permissions import IsAdmin, IsModerator
 
 class CustomPermissionMixin:
     def get_permissions(self):
-        if self.action == 'retrieve':
+        if self.action == 'retrieve' or self.action == 'list':
             return [AllowAny()]
         elif self.action == 'delete':
             return [IsAuthenticated(), IsAdmin()]
