@@ -192,7 +192,8 @@ def logout_view(request):
     response = Response({"message": "Вы успешно вышли из аккаунта."}, status=status.HTTP_200_OK)
     response.delete_cookie('refresh_token')
     response.delete_cookie('access_token')
-    return Response({"message": "Вы успешно вышли из аккаунта."}, status=status.HTTP_200_OK)
+    return response
+    # return Response({"message": "Вы успешно вышли из аккаунта."}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def refresh_access_token(request):
